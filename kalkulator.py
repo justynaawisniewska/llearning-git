@@ -11,23 +11,24 @@ def get_data():
 
 def add(a,b):
     logging.info('Dodajemy {0} i {1} '.format(a, b))
-    print('Wynik {0}'.format(a+b))
+    return a+b
 
 def sub(a,b):
     logging.info('Odejmujemy {0} i {1} '.format(a, b))
-    print ('Wynik {0}'.format(a-b))
+    return a-b
 
 def multiply(a,b):
     logging.info('Mnozymy {0} i {1} '.format(a, b))
-    print('Wynik {0}'.format(a*b))
+    return a*b
 
 def div(a,b):
     logging.info('Dzielimy {0} i {1} '.format(a, b))
-    print ('Wynik {0}'.format(a/b))
+    return a/b
    
 def calculator():
     a,b, dzialanie = get_data()
-    dict[dzialanie](a,b)
+    y = dict[dzialanie](a,b)
+    print(f'Wynik: {y}')
 
 dict={
     '1': add,
@@ -35,4 +36,5 @@ dict={
     '3': multiply,
     '4': div
 }
+    
 calculator()
