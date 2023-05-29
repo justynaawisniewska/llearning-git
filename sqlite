@@ -1,0 +1,133 @@
+import sqlite3
+from sqlite3 import Error
+
+def create_connection(db_file):
+   """ create a database connection to the SQLite database
+       specified by db_file
+   :param db_file: database file
+   :return: Connection object or None
+   """
+   conn = None
+   try:
+       conn = sqlite3.connect(db_file)
+       return conn
+   except Error as e:
+       print(e)
+
+   return conn
+
+def execute_sql(conn, sql):
+   """ Execute sql
+   :param conn: Connection object
+   :param sql: a SQL script
+   :return:
+   """
+   try:
+       c = conn.cursor()
+       c.execute(sql)
+   except Error as e:
+       print(e)
+
+if __name__ == "__main__":
+
+    create_books_sql = """
+    -- books table
+    CREATE TABLE IF NOT EXISTS books (
+    id integer PRIMARY KEY,
+    title text NOT NULL,
+    author_id integer,
+    year integer,
+    FOREIGN KEY (author_id) REFERENCES author (id)
+    );
+    """
+
+create_author_sql = """
+    -- author table
+    CREATE TABLE IF NOT EXISTS author (
+        id integer PRIMARY KEY,
+        year_of_birth integer NOT NULL,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL
+    );
+    """
+
+def execute_sql(conn, sql):
+   """ Execute sql
+   :param conn: Connection object
+   :param sql: a SQL script
+   :return:
+   """
+   try:
+       c = conn.cursor()
+       c.execute(sql)
+   except Error as e:
+       print(e)
+
+db_file = "database.db"
+
+conn = create_connection(db_file)
+if conn is not None:
+    execute_sql(conn, create_books_sql)
+    execute_sql(conn, create_author_sql)
+    #conn.close()
+
+def add_books(conn, books):
+   """
+   Create a new book into the books table
+   :param conn:
+   :param books:
+   :return: id
+   """
+   sql = '''INSERT INTO books(title, author_id, year)
+             VALUES(?,?,?)'''
+   cur = conn.cursor()
+   cur.execute(sql, books)
+   conn.commit()
+   return cur.lastrowid
+
+books = ("XYZ", "2345", "1990")
+pr_id = add_books(conn, books)
+print(pr_id)
+
+
+def add_author(conn, author):
+   """
+   Create a new author into the author table
+   :param conn:
+   :param author:
+   :return: id
+   """
+   sql = '''INSERT INTO author(year_of_birth, first_name, last_name)
+             VALUES(?,?,?)'''
+   cur = conn.cursor()
+   cur.execute(sql, author)
+   conn.commit()
+   return cur.lastrowid
+
+author = ("1890", "Mark", "Johns")
+pr_id = add_author(conn, author)
+
+def delete_where(conn, books, **kwargs):
+   """
+   Delete from table books where attributes from
+   :param conn:  Connection to the SQLite database
+   :param table: table books
+   :param kwargs: dict of attributes and values
+   :return:
+   """
+   qs = []
+   values = tuple()
+   for k, v in kwargs.items():
+       qs.append(f"{k}=?")
+       values += (v,)
+   q = " AND ".join(qs)
+
+   sql = f'DELETE FROM {books} WHERE {q}'
+   cur = conn.cursor()
+   cur.execute(sql, values)
+   conn.commit()
+   print("Deleted")
+
+if __name__ == "__main__":
+   conn = create_connection("database.db")
+   delete_where(conn, "books", id=4 )
